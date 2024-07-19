@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Breaking Bad Guess Quotes</title>
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/4.3.1/css/bootstrap.min.css}" />
+    <style>
+        .content {
+            margin-top: 50px;
+        }
+        .header-title {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .list-group-item {
+            background-color: transparent;
+            border: none;
+            padding-left: 0;
+        }
+        .list-group-item::before {
+            content: "• ";
+            color: #007bff;
+        }
+        .code-block {
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+            white-space: pre-wrap;
+            font-family: monospace;
+        }
+        .json-example {
+            margin-top: 10px;
+            background-color: #272c33;
+            color: #dcdcdc;
+            padding: 10px;
+            border-radius: 5px;
+            white-space: pre-wrap;
+            font-family: monospace;
+        }
+        .todo-list {
+            margin-top: 40px;
+        }
+        .todo-item {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1 class="header-title">Breaking Bad Guess Quotes</h1>
+    <div class="content">
+        <p>BreakingQuotes is a personal project that I built for learning purposes. It comprises a web platform where you can test your knowledge about the Breaking Bad series
+            by trying to figure out which character said which quotes. The more correct answers you have, the higher you will be on the scoreboard.
+            <br>
+            <a href="/trivia">Trivia</a>
+        </p>
+
+        <p>If you want to support the project, you can also add some quotes. Fill out the form,
+            I will receive an email, and I will personally check the quote and add it (yes, I’m a real fan of the series, I know all the quotes :P).
+            <br>
+            <a href="/suggestions">Add a quote</a>
+        </p>
+        <p>
+            <a href="/">Scoreboard</a>
+        </p>
+
+        <h2>Open API</h2>
+        <p>The project includes an open API, if you want to use it for your own projects. The endpoints are:</p>
+
+        <ul class="list-group">
+            <li class="list-group-item">
+                <strong>GET api/characters/</strong>
+                <p>Retrieve a list of all characters.</p>
+                <div class="code-block">
+                    <code>http://breakingquotes.com/api/characters/</code>
+                </div>
+                <div class="json-example">
+                    <code>
+                        [
+                        {
+                        "id": 1,
+                        "name": "Walter White"
+                        },
+                        {
+                        "id": 2,
+                        "name": "Jesse Pinkman"
+                        },
+                        {
+                        "id": 3,
+                        "name": "Saul Goodman"
+                        }
+                        ]
+                    </code>
+                </div>
+            </li>
+            <li class="list-group-item">
+                <strong>GET api/characters/{id}</strong>
+                <p>Retrieve a specific character by ID.</p>
+                <div class="code-block">
+                    <code>http://breakingquotes.com/api/characters/{id}</code>
+                </div>
+                <div class="json-example">
+                    <code>
+                        {
+                        "id": 1,
+                        "name": "Walter White"
+                        }
+                    </code>
+                </div>
+            </li>
+            <li class="list-group-item">
+                <strong>GET api/quotes/</strong>
+                <p>Retrieve a list of all quotes.</p>
+                <div class="code-block">
+                    <code>http://breakingquotes.com/api/quotes/</code>
+                </div>
+                <div class="json-example">
+                    <code>
+                        [
+                        {
+                        "id": 1,
+                        "text": "I am the one who knocks!",
+                        "character": {
+                        "id": 1,
+                        "name": "Walter White"
+                        }
+                        },
+                        {
+                        "id": 2,
+                        "text": "Yeah, science!",
+                        "character": {
+                        "id": 2,
+                        "name": "Jesse Pinkman"
+                        }
+                        }
+                        ]
+                    </code>
+                </div>
+            </li>
+            <li class="list-group-item">
+                <strong>GET api/quotes/{id}</strong>
+                <p>Retrieve a specific quote by ID.</p>
+                <div class="code-block">
+                    <code>http://breakingquotes.com/api/quotes/{id}</code>
+                </div>
+                <div class="json-example">
+                    <code>
+                        {
+                        "id": 1,
+                        "text": "I am the one who knocks!",
+                        "character": {
+                        "id": 1,
+                        "name": "Walter White"
+                        }
+                        }
+                    </code>
+                </div>
+            </li>
+            <li class="list-group-item">
+                <strong>GET api/quotes/random</strong>
+                <p>Retrieve 20 random quotes.</p>
+                <div class="code-block">
+                    <code>http://breakingquotes.com/api/quotes/random</code>
+                </div>
+                <div class="json-example">
+                    <code>
+                        {
+                        "id": 2,
+                        "text": "Yeah, science!",
+                        "character": {
+                        "id": 2,
+                        "name": "Jesse Pinkman"
+                        }
+                        }
+                    </code>
+                </div>
+            </li>
+        </ul>
+
+        <p>If you want to support the project further, you can check the repo, fork it, and add any changes you want.
+            <a href="https://github.com/Roscow/BBquotesGuess" target="_blank">Github Repo</a>
+        </p>
+
+        <p>You can also build your own projects like me using Digital Ocean with my link, and we both get some credits.
+            <a href="https://m.do.co/c/890c1542ea64" target="_blank">Digital Ocean</a>
+        </p>
+
+
+        <p>And you can add me on some social networks where I’m not very active...
+            <br>
+            <a href="https://www.linkedin.com/in/nicolas-v-973209289/" target="_blank">LinkedIn</a>
+            <br>
+            <a href="https://nicolasvaldes.dev" target="_blank">Portfolio</a>
+        </p>
+
+        <h2>Technologies Used</h2>
+        <ul class="list-group">
+            <li class="list-group-item">Java</li>
+            <li class="list-group-item">Spring Boot</li>
+            <li class="list-group-item">Ubuntu Server - VM</li>
+            <li class="list-group-item">PostgreSQL database</li>
+            <li class="list-group-item">Nginx</li>
+        </ul>
+
+        <p>I’m learning, just like you... so be cool...</p>
+    </div>
+</div>
+<script th:src="@{/webjars/bootstrap/4.3.1/js/bootstrap.bundle.min.js}"></script>
+</body>
+</html>
