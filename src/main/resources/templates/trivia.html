@@ -10,6 +10,61 @@
             font-size: 18px;
             color: #6c757d;
         }
+        .character-options {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .character-option {
+            margin: 10px;
+            text-align: center;
+        }
+        .character-option input[type="radio"] {
+            display: none;
+        }
+        .character-option label {
+            display: block;
+            cursor: pointer;
+        }
+        .character-option label img {
+            border: 2px solid transparent;
+            border-radius: 50%;
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            filter: grayscale(100%);
+            transition: filter 0.3s ease;
+        }
+        .character-option input[type="radio"]:checked + label img {
+            border-color: #007bff;
+            filter: none; /* Quitar el filtro de escala de grises */
+        }
+        .character-name {
+            margin-top: 5px;
+            font-size: 14px;
+        }
+        .question-container {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+            transform: translateX(100%);
+        }
+        .question-container.active {
+            display: block;
+            opacity: 1;
+            transform: translateX(0);
+        }
+        .question-container.exit {
+            display: block;
+            opacity: 0;
+            transform: translateX(-100%);
+        }
+        .quote-counter {
+            text-align: center;
+            font-size: 16px;
+            color: #6c757d;
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
@@ -19,33 +74,94 @@
     <div th:if="${errorMessage}" class="alert alert-danger" role="alert">
         <span th:text="${errorMessage}"></span>
     </div>
+    <div class="quote-counter" id="quoteCounter">Quote 1 / <span th:text="${#lists.size(quotes)}">20</span></div>
     <form id="triviaForm" action="/trivia/submit" method="post" th:object="${triviaForm}" class="mt-3">
-        <div th:each="quote, iterStat : ${quotes}">
+        <div th:each="quote, iterStat : ${quotes}" th:classappend="${iterStat.index == 0} ? 'active' : ''" class="question-container">
             <div class="mb-4">
                 <label th:for="${'quote' + iterStat.index}" th:text="'Quote ' + (${iterStat.index + 1}) + ': ' + ${quote.text}"></label>
                 <input type="hidden" th:field="*{answers[__${iterStat.index}__].quoteId}" th:value="${quote.id}" />
-                <select th:id="${'quote' + iterStat.index}" th:field="*{answers[__${iterStat.index}__].characterId}" class="form-select">
-                    <option value="" selected>Select a character</option>
-                    <option th:each="character : ${characters}" th:value="${character.id}" th:text="${character.name}"></option>
-                </select>
+                <div class="character-options">
+                    <div th:each="character : ${characters}" class="character-option">
+                        <input type="radio" th:id="${'quote' + iterStat.index + 'character' + character.id}"
+                               th:field="*{answers[__${iterStat.index}__].characterId}" th:value="${character.id}" />
+                        <label th:for="${'quote' + iterStat.index + 'character' + character.id}">
+                            <img th:src="@{'/images/characters/' + ${character.name.replace(' ', '_').toLowerCase()} + '.webp'}" alt="Character Image" />
+                            <div class="character-name" th:text="${character.name}"></div>
+                        </label>
+                    </div>
+                </div>
             </div>
         </div>
         <div class="text-center mt-4">
-            <button type="submit" class="btn btn-primary">Submit Answers</button>
+            <button type="button" class="btn btn-secondary" id="prevQuestion" style="display: none;">Previous Question</button>
+            <button type="button" class="btn btn-primary" id="nextQuestion">Next Question</button>
+            <button type="submit" class="btn btn-success" id="submitTrivia" style="display: none;">Submit Answers</button>
         </div>
     </form>
 </div>
 <script th:src="@{/webjars/bootstrap/5.1.3/js/bootstrap.bundle.min.js}"></script>
 <script>
-    document.getElementById('triviaForm').addEventListener('submit', function(event) {
-        var selects = document.querySelectorAll('select');
-        for (var i = 0; i < selects.length; i++) {
-            if (selects[i].value === "") {
-                event.preventDefault();
-                alert("Please select a character for all quotes.");
-                return false;
-            }
+    document.addEventListener('DOMContentLoaded', function() {
+        let currentQuestion = 0;
+        const questions = document.querySelectorAll('.question-container');
+        const nextButton = document.getElementById('nextQuestion');
+        const prevButton = document.getElementById('prevQuestion');
+        const submitButton = document.getElementById('submitTrivia');
+        const quoteCounter = document.getElementById('quoteCounter');
+
+        function showQuestion(index) {
+            questions.forEach((question, i) => {
+                question.classList.remove('active', 'exit');
+                if (i === index) {
+                    setTimeout(() => question.classList.add('active'), 50); // Retarda la adición de la clase active
+                }
+            });
+            quoteCounter.textContent = `Quote ${index + 1} / ${questions.length}`;
         }
+
+        nextButton.addEventListener('click', function() {
+            if (currentQuestion < questions.length - 1) {
+                questions[currentQuestion].classList.add('exit');
+                currentQuestion++;
+                showQuestion(currentQuestion);
+                if (currentQuestion === questions.length - 1) {
+                    nextButton.style.display = 'none';
+                    submitButton.style.display = 'inline-block';
+                }
+                prevButton.style.display = 'inline-block';
+            }
+        });
+
+        prevButton.addEventListener('click', function() {
+            if (currentQuestion > 0) {
+                questions[currentQuestion].classList.remove('active');
+                currentQuestion--;
+                showQuestion(currentQuestion);
+                if (currentQuestion === 0) {
+                    prevButton.style.display = 'none';
+                }
+                nextButton.style.display = 'inline-block';
+                submitButton.style.display = 'none';
+            }
+        });
+
+        document.getElementById('triviaForm').addEventListener('submit', function(event) {
+            const currentQuestionRadios = questions[currentQuestion].querySelectorAll('input[type="radio"]');
+            let valid = false;
+            for (const radio of currentQuestionRadios) {
+                if (radio.checked) {
+                    valid = true;
+                    break;
+                }
+            }
+            if (!valid) {
+                event.preventDefault();
+                alert("Please select a character for this quote.");
+            }
+        });
+
+        // Mostrar la primera pregunta al cargar la página
+        showQuestion(currentQuestion);
     });
 </script>
 </body>
